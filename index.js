@@ -8,9 +8,7 @@ const echonet = require('./echonet');
 const SerialPort = require('serialport')
 const { Readline } = SerialPort.parsers;
 
-// const path = '/dev/tty.usbserial-A603BU2X';
-const path = '/dev/ttyS0';
-const port = new SerialPort(path, { autoOpen: true, baudRate: 115200, }, function (err) {
+const port = new SerialPort(process.env.SERIAL_PORT, { autoOpen: true, baudRate: 115200, }, function (err) {
     if (err) {
         return console.log('Error: ', err.message)
     }
