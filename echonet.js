@@ -129,12 +129,20 @@ class EchonetObject {
 class Frame {
     // フレームのプリセット
     static PRESET = {
+        '積算電力量計測値（正方向計測値）': Frame.create(
+            EchonetObject.PRESET['コントローラー'],
+            EchonetObject.PRESET['スマート電力量メータ'],
+            0x62,   // プロパティ値読み出し要求
+            [{ EPC: 0xE0, PDC: 0x00, EDT: null },]
+        ),
+
         '瞬時電力計測値': Frame.create(
             EchonetObject.PRESET['コントローラー'],
             EchonetObject.PRESET['スマート電力量メータ'],
             0x62,   // プロパティ値読み出し要求
             [{ EPC: 0xE7, PDC: 0x00, EDT: null }]
         ),
+
         '定時積算電力量計測値（正方向計測値）': Frame.create(
             EchonetObject.PRESET['コントローラー'],
             EchonetObject.PRESET['スマート電力量メータ'],
@@ -147,6 +155,17 @@ class Frame {
             EchonetObject.PRESET['スマート電力量メータ'],
             0x62,   // プロパティ値読み出し要求
             [{ EPC: 0xEB, PDC: 0x00, EDT: null }]
+        ),
+
+        '積算電力量パラメーター': Frame.create(
+            EchonetObject.PRESET['コントローラー'],
+            EchonetObject.PRESET['スマート電力量メータ'],
+            0x62,   // プロパティ値読み出し要求
+            [
+                { EPC: 0xD3, PDC: 0x00, EDT: null },    // 係数
+                { EPC: 0xD7, PDC: 0x00, EDT: null },    // 積算電力量有効桁数
+                { EPC: 0xE1, PDC: 0x00, EDT: null }     // 積算電力量単位（正方向、逆方向計測値）
+            ]
         ),
     }
 
@@ -287,10 +306,48 @@ class Frame {
                     case 0x88:  // 低圧スマート電力量メータ
                         switch (property.EPC) {
                             // case 0x80: name = '動作状態'; break;
-                            // case 0xD3: name = '係数'; break;
-                            // case 0xD7: name = '積算電力量有効桁数'; break;
-                            // case 0xE0: name = '積算電力量計測値（正方向計測値）'; break;
-                            // case 0xE1: name = '積算電力量単位（正方向、逆方向計測値）'; break;
+
+                            case 0xD3:
+                                {
+                                    const buf = Uint8Array.from(property.EDT).buffer;
+                                    ret = {
+                                        type: '係数',
+                                        value: new DataView(buf).getUint32(0),
+                                    }
+                                }
+                                break;
+
+                            case 0xD7:
+                                {
+                                    const buf = Uint8Array.from(property.EDT).buffer;
+                                    ret = {
+                                        type: '積算電力量有効桁数',
+                                        value: new DataView(buf).getUint8(0),
+                                        unit: '桁'
+                                    }
+                                }
+                                break;
+
+                            case 0xE0:
+                                {
+                                    const buf = Uint8Array.from(property.EDT).buffer;
+                                    ret = {
+                                        type: '積算電力量計測値（正方向計測値）',
+                                        value: new DataView(buf).getUint32(0),
+                                    }
+                                }
+                                break;
+
+                            case 0xE1:
+                                {
+                                    const buf = Uint8Array.from(property.EDT).buffer;
+                                    ret = {
+                                        type: '積算電力量単位（正方向、逆方向計測値）',
+                                        value: new DataView(buf).getUint8(0),
+                                    }
+                                }
+                                break;
+
                             // case 0xE2: name = '積算電力量計測値履歴1（正方向計測値）'; break;
                             // case 0xE3: name = '積算電力量計測値（逆方向計測値）'; break;
                             // case 0xE4: name = '積算電力量計測値履歴1（逆方向計測値）'; break;
@@ -324,7 +381,6 @@ class Frame {
                                         type: '定時積算電力量計測値（正方向計測値）',
                                         datetime: datetime,
                                         value: new DataView(buf, 7, 4).getUint32(0),
-                                        unit: 'kWh'
                                     }
                                 }
                                 break;
@@ -345,7 +401,6 @@ class Frame {
                                         type: '定時積算電力量計測値（逆方向計測値）',
                                         datetime: datetime,
                                         value: new DataView(buf, 7, 4).getUint32(0),
-                                        unit: 'kWh'
                                     }
                                 }
                                 break;

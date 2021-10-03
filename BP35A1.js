@@ -20,6 +20,11 @@ class BP35A1 extends EventEmitter {
     get address() { return this._address; }
     get port() { return this._port; }
 
+    start() {
+        // エコーバックの抑止から通信シーケンススタート。
+        this.send(`SKSREG`, 'SFE 0');
+    }
+
     // コマンドを送信する。
     send(command, parameters) {
         // 改行コードが '\r' で他と異なるので、手動で行うコマンド。
@@ -127,6 +132,8 @@ class BP35A1 extends EventEmitter {
                         console.log('EVENT PANA による接続が完了した');
                         this._isConnected = true;
                         this._state = 'IDLE';
+
+                        this.emit('connect');
                         break;
 
                     case '26': console.log('EVENT 接続相手からセッション終了要求を受信した'); break;
@@ -160,13 +167,13 @@ class BP35A1 extends EventEmitter {
 
                             console.log(`ERXUDP 送信元 ECHONET Lite [${frame.SEOJ.toString()}]`);
 
-                            this.emit('echonet', frame);
-
                             // 定時の通知とタイミングが被ると要求した瞬時電力計測値が応答されないっぽいので、
                             // スマート電力量メータから何か応答があればステートをアイドルにしちゃう。
                             if (echonet.EchonetObject.equals(frame.SEOJ, echonet.EchonetObject.PRESET['スマート電力量メータ'])) {
                                 this._state = 'IDLE';
                             }
+
+                            this.emit('echonet', frame);
                         }
                         break;
 
