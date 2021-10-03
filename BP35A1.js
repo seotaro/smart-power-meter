@@ -1,11 +1,13 @@
 'use strict';
 
+const { EventEmitter } = require("events");
 const utils = require('./utils');
 const echonet = require('./echonet');
 
 // BP35A1 との通信をステートマシンとして表現した。
-class BP35A1 {
+class BP35A1 extends EventEmitter {
     constructor(port) {
+        super();
         this._port = port;          // シリアルポート
         this._state = 'IDLE';
         this._PAN = null;           // 接続先コーディネーターの PAN 情報
@@ -158,67 +160,7 @@ class BP35A1 {
 
                             console.log(`ERXUDP 送信元 ECHONET Lite [${frame.SEOJ.toString()}]`);
 
-                            if (echonet.EchonetObject.equals(frame.SEOJ, echonet.EchonetObject.PRESET['ノードプロファイル']) && (frame.ESV === 0x73)) {
-                                // 送信元が プロファイルクラスグループ x ノードプロファイル x 一般ノード で プロパティ値通知
-
-                                frame.properties.forEach(property => {
-                                    switch (property.EPC) {
-                                        case 0xD5:
-                                            {
-                                                let isSmartPowerMeter = false;
-
-                                                const desc = echonet.Frame.parseProperty(frame.SEOJ, property);
-                                                let EOJs = '';
-                                                for (let i = 0; i < desc.value.length; i++) {
-                                                    const instance = desc.value[i];
-                                                    if (echonet.EchonetObject.equals(instance, echonet.EchonetObject.PRESET['スマート電力量メータ'])) {
-                                                        isSmartPowerMeter = true;
-                                                    }
-
-                                                    if (EOJs.length) {
-                                                        EOJs += ', ';
-                                                    }
-                                                    EOJs += `[${instance.toString()}]`;
-                                                }
-
-                                                console.log(`${desc.type} ${EOJs}`);
-
-                                                if (!isSmartPowerMeter) {
-                                                    console.error('PAN にスマート電力量メータが存在しない');
-                                                }
-                                            }
-
-                                            break;
-                                    }
-                                })
-
-                            } else if (echonet.EchonetObject.equals(frame.SEOJ, echonet.EchonetObject.PRESET['スマート電力量メータ'])) {
-                                // 送信元が 住宅・設備関連機器クラスグループ x 低圧スマート電力量メータ
-
-                                frame.properties.forEach(property => {
-                                    switch (property.EPC) {
-                                        case 0xE7:
-                                            {
-                                                const desc = echonet.Frame.parseProperty(frame.SEOJ, property);
-                                                console.log(`${desc.type} ${desc.value} [${desc.unit}]`);
-                                            }
-                                            break;
-
-                                        case 0xEA:
-                                        case 0xEB:
-                                            {
-                                                const desc = echonet.Frame.parseProperty(frame.SEOJ, property);
-                                                console.log(`${desc.type} ${desc.datetime.format()} ${desc.value} [${desc.unit}]`);
-                                            }
-                                            break;
-                                    }
-                                })
-
-                            } else {
-                                console.error(`unknown ECHONET frame`);
-                                console.log(frameData.toString("hex"));
-                                console.log(frame.toString());
-                            }
+                            this.emit('echonet', frame);
 
                             // 定時の通知とタイミングが被ると要求した瞬時電力計測値が応答されないっぽいので、
                             // スマート電力量メータから何か応答があればステートをアイドルにしちゃう。

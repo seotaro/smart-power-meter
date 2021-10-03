@@ -318,7 +318,7 @@ class Frame {
                                     const hours = new DataView(buf, 4, 1).getUint8(0);
                                     const minutes = new DataView(buf, 5, 1).getUint8(0);
                                     const seconds = new DataView(buf, 6, 1).getUint8(0);
-                                    const datetime = moment(`${year}-${month}-${day} ${hours}:${minutes}:${seconds} +0900`, `YYYY-MM-DD HH:mm:ss Z`);
+                                    const datetime = moment(`${year}-${month}-${day} ${hours}:${minutes}:${seconds} +0900`, `YYYY-MM-DD HH:mm:ss Z`).toDate();
 
                                     ret = {
                                         type: '定時積算電力量計測値（正方向計測値）',
@@ -339,7 +339,7 @@ class Frame {
                                     const hours = new DataView(buf, 4, 1).getUint8(0);
                                     const minutes = new DataView(buf, 5, 1).getUint8(0);
                                     const seconds = new DataView(buf, 6, 1).getUint8(0);
-                                    const datetime = moment(`${year}-${month}-${day} ${hours}:${minutes}:${seconds} +0900`, `YYYY-MM-DD HH:mm:ss Z`);
+                                    const datetime = moment(`${year}-${month}-${day} ${hours}:${minutes}:${seconds} +0900`, `YYYY-MM-DD HH:mm:ss Z`).toDate();
 
                                     ret = {
                                         type: '定時積算電力量計測値（逆方向計測値）',
