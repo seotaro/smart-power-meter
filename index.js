@@ -140,7 +140,7 @@ bp35a1.on('echonet', (frame) => {
 
                 case 0xEA:
                 case 0xEB:
-                    console.log(`${desc.type} ${desc.datetime.toISOString()} ${convertAccumlatedPower(desc.value)} [${desc.unit}]`);
+                    console.log(`${desc.type} ${desc.datetime.toISOString()} ${convertAccumlatedPower(desc.value)} [kWh]`);
                     break;
 
                 default:
