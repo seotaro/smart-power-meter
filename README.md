@@ -1,6 +1,6 @@
 # BP35A1 を使って、スマートメーターから電力情報を取得する
 
-スマートメータには Bルート※、Wi-SUN（Wireless Smart Utility Network）で接続する。電力会社への申し込みと対応する通信モジュールが必要となる。通信モジュールは ROHM 社製 BP35A1 の一択、これをホストマシンからシリアル接続して使用する。
+スマートメータには Bルート※、通信規格は Wi-SUN（Wireless Smart Utility Network）で接続する。電力会社への申し込みと対応する通信モジュールが必要となる。
 
 ※ スマートメーターから先の通信経路は A と B の二つがあって、Aルートは電力会社、Bルートは宅内への経路。
 
@@ -12,7 +12,8 @@
 
 ### 通信モジュール購入
 
-取り扱い店が極めて少ないが [チップワンストップ](https://www.chip1stop.com/view/dispDetail/DispDetail?partId=ROHM-0154248) で購入した。
+Wi-SUN に対応するモジュールの選択肢は少なく、DIY で使う場合には ROHM 社製 BP35A1 の一択、これをホストマシンからシリアル接続して使用する。
+取り扱い店も極めて少ないが [チップワンストップ](https://www.chip1stop.com/view/dispDetail/DispDetail?partId=ROHM-0154248) で購入した。
 通信モジュールと合わせてアダプターボードも購入すること。
 
 - BP35A1（通信モジュール）
