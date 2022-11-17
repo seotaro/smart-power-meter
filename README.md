@@ -6,15 +6,57 @@
 
 ## 準備
 
-「[電力メーター情報発信サービス（Bルートサービス）](https://www.tepco.co.jp/pg/consignment/liberalization/smartmeter-broute.html)」に申し込んで認証IDとパスワードを取得する。
+### Bルートサービスの申し込み
 
-通信モジュールは BP35A1 を入手する。通信モジュールと合わせてアダプターボードも購入すること。取り扱い店が極めて少ないが [チップワンストップ](https://www.chip1stop.com/view/dispDetail/DispDetail?partId=ROHM-0154248) で購入した。![通信モジュール](https://user-images.githubusercontent.com/46148606/202370575-542cd52e-a8bf-411e-ad23-4edded3281b4.jpeg)
+管轄の電力会社に「[電力メーター情報発信サービス（Bルートサービス）](https://www.tepco.co.jp/pg/consignment/liberalization/smartmeter-broute.html)」（リンクは東京電力）を申し込んで認証IDとパスワードを取得する。
+
+### 通信モジュール購入
+
+取り扱い店が極めて少ないが [チップワンストップ](https://www.chip1stop.com/view/dispDetail/DispDetail?partId=ROHM-0154248) で購入した。
+通信モジュールと合わせてアダプターボードも購入すること。
 
 - BP35A1（通信モジュール）
 - BP35A7（アダプターボード）
-- BP35A7-accessories（固定ネジ類）
+- BP35A7-accessories（ピンヘッダ、固定ネジ類）
 
-BP35A1 をシリアルポートに接続する。
+![通信モジュール](https://user-images.githubusercontent.com/46148606/202370575-542cd52e-a8bf-411e-ad23-4edded3281b4.jpeg)
+
+### 通信モジュール確認
+
+通信モジュールとアダプターボードを組み立てたら、実行したコマンドに応答することを確認しておく。
+
+例）macOS の場合
+
+USB-シリアル変換アダプターを使って、Mac の USBポートに接続する。
+
+![PXL_20221117_080545892](https://user-images.githubusercontent.com/46148606/202397333-ed5eb1c5-74a8-4ab8-be07-71820e56ac5c.jpg)
+
+![PXL_20221117_080706299](https://user-images.githubusercontent.com/46148606/202397344-af7109dd-7f0e-4a47-94b3-09edf842b6cd.jpg)
+
+デバイス名を確認して、screen コマンドで接続する。
+
+```bash
+ls /dev/tty.*                  
+/dev/tty.Aaaaaaaa   /dev/tty.Bbbbbbbbbbb
+/dev/tty.Ccccccccc /dev/tty.usbserial-Xxxxxxxx
+
+screen /dev/tty.usbserial-Xxxxxxxx 115200
+```
+
+試しに SKVER コマンド、SKINFO コマンドを実行して、それぞれ応答があることを確認する。
+
+```bash
+SKVER
+EVER 1.2.10
+OK
+SKINFO
+EINFO XXXX:AAAA:BBBB:CCCC:YYYY:DDDD:EEEE:FFFF GGGGGGGGGGGGGGGG HH IIII JJJJ
+OK
+```
+
+※ EINFO の XXXX と YYYY がテクニカルリファレンスのユーザーIDとパスワード。
+
+※ screen コマンドの終了は ⌃a + ⌃k と入力する
 
 ## インストール
 
